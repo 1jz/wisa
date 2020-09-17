@@ -1,0 +1,11 @@
+https://httpstat.us/200
+https://httpstat.us/403
+https://httpstat.us/404
+
+[https://httpstat.us/200]
+[https://httpstat.us/403]
+[https://httpstat.us/404]
+
+<a href="https://httpstat.us/200"/>
+<a href="https://httpstat.us/403"/>
+<a href="https://httpstat.us/404"/>
