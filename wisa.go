@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"sync"
+  "github.com/gookit/color"
 )
 
 // flag globals
@@ -31,11 +32,13 @@ func checkLink(wg *sync.WaitGroup, url string) {
 	} else {
 		// Status codes https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 		if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-			fmt.Printf("[PASS] [%d] %s\n", resp.StatusCode, url)
+      color.New(color.FgGreen).Printf("[PASS] [%d] %s\n", resp.StatusCode, url)
 		} else if resp.StatusCode == 403 {
-			fmt.Printf("[WARN] [%d] %s\n", resp.StatusCode, url)
+      color.New(color.FgGray).Printf("[WARN] [%d] %s\n", resp.StatusCode, url)
+     
 		} else {
-			fmt.Printf("[DEAD] [%d] %s\n", resp.StatusCode, url)
+      color.New(color.FgRed).Printf("[DEAD] [%d] %s\n", resp.StatusCode, url)
+      
 		}
 	}
 }
