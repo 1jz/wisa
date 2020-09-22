@@ -58,7 +58,7 @@ func main() {
 	rIP := regexp.MustCompile(`(?:(?:(?:https?|ftp):)\/\/)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d{2,5})?`)
 
 	// check if arg is passed
-	if len(*filenamePtr) <= 0 {
+	if len(*filenamePtr) == 0 {
 		fmt.Println("Usage: wisa -f [file]")
 		os.Exit(1)
 	}
