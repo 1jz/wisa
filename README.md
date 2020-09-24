@@ -3,10 +3,6 @@ Who Is Still Alive: a broken link checker
 
 # Building
 
-Install dependency for color
-
-```go get github.com/gookit/color```
-
 Build:
 
 ```go build wisa.go```
