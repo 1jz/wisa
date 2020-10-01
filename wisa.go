@@ -1,15 +1,16 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"sync"
+	"time"
 
 	"github.com/gookit/color"
+	flag "github.com/spf13/pflag"
 )
 
 // flag globals
@@ -24,7 +25,14 @@ func checkLink(wg *sync.WaitGroup, url string) {
 	defer wg.Done()
 
 	// use HEAD request https://golang.org/pkg/net/http/
-	resp, err := http.Head(url)
+	// resp, err := http.Head(url)
+	client := http.Client{
+		Timeout: 3 * time.Second,
+	}
+	resp, err := client.Head(url)
+	if err != nil {
+		return
+	}
 
 	if err != nil {
 		if *verbosePtr {
@@ -45,8 +53,8 @@ func checkLink(wg *sync.WaitGroup, url string) {
 func main() {
 
 	// https://golang.org/pkg/flag/
-	filenamePtr = flag.String("f", "", "filename input (required)") // filename input
-	verbosePtr = flag.Bool("v", false, "verbose output")            // (error logs)
+	filenamePtr = flag.StringP("file", "f", "", "filename input (required)") // filename input
+	verbosePtr = flag.BoolP("version", "v", false, "verbose output")         // (error logs)
 
 	flag.Parse()
 
