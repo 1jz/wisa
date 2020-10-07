@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -17,7 +19,14 @@ import (
 var (
 	filenamePtr *string
 	verbosePtr  *bool
+	jsonPtr     *bool
 )
+
+// RequestResult is a struct for storing urls and status codes
+type RequestResult struct {
+	URL    string `json:"url"`
+	Status int    `json:"status"`
+}
 
 // remove duplicate strings from a slice of strings
 func removeDuplicate(urls []string) []string {
@@ -32,7 +41,9 @@ func removeDuplicate(urls []string) []string {
 	return result
 }
 
-func checkLink(wg *sync.WaitGroup, url string) {
+func checkLink(wg *sync.WaitGroup, url string) (RequestResult, error) {
+	var r RequestResult
+	var reqErr error = nil
 
 	// defered function is run when surrounding functions are completed
 	defer wg.Done()
@@ -43,31 +54,33 @@ func checkLink(wg *sync.WaitGroup, url string) {
 		Timeout: 3 * time.Second,
 	}
 	resp, err := client.Head(url)
-	if err != nil {
-		return
-	}
 
 	if err != nil {
-		if *verbosePtr {
+		if *verbosePtr && !*jsonPtr {
 			fmt.Println(err)
 		}
+		reqErr = errors.New("request error")
 	} else {
-		// Status codes https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-		if resp.StatusCode == 200 {
-			color.New(color.FgGreen).Printf("[GOOD] [%d] %s\n", resp.StatusCode, url)
-		} else if resp.StatusCode == 400 || resp.StatusCode == 404 {
-			color.New(color.FgRed).Printf("[BAD] [%d] %s\n", resp.StatusCode, url)
-		} else {
-			color.New(color.FgGray).Printf("[UNKNOWN] [%d] %s\n", resp.StatusCode, url)
+		r = RequestResult{url, resp.StatusCode}
+		if !*jsonPtr {
+			if resp.StatusCode == 200 {
+				color.New(color.FgGreen).Printf("[GOOD] [%d] %s\n", resp.StatusCode, url)
+			} else if resp.StatusCode == 400 || resp.StatusCode == 404 {
+				color.New(color.FgRed).Printf("[BAD] [%d] %s\n", resp.StatusCode, url)
+			} else {
+				color.New(color.FgGray).Printf("[UNKNOWN] [%d] %s\n", resp.StatusCode, url)
+			}
 		}
 	}
+	return r, reqErr
 }
 
 func main() {
 
-	// https://golang.org/pkg/flag/
+	// https://github.com/spf13/pflag
 	filenamePtr = flag.StringP("file", "f", "", "filename input (required)") // filename input
 	verbosePtr = flag.BoolP("version", "v", false, "verbose output")         // (error logs)
+	jsonPtr = flag.BoolP("json", "j", false, "json output")                  // turns off verbose output
 
 	flag.Parse()
 
@@ -84,13 +97,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	// notift if -v flag is passed
-	if *verbosePtr {
+	// notify if -v flag is passed
+	if *verbosePtr && !*jsonPtr {
 		fmt.Println("verbose output enabled...")
 	}
 
 	// Open a file (read-only) https://golang.org/pkg/os/#Open
-	fmt.Printf("Reading %s...\n", *filenamePtr)
+	if !*jsonPtr {
+		fmt.Printf("Reading %s...\n", *filenamePtr)
+	}
+
 	file, err := os.Open(*filenamePtr)
 
 	if err != nil {
@@ -115,12 +131,35 @@ func main() {
 	// create workgroup to ensure all routines finish https://golang.org/pkg/sync/#WaitGroup
 	var wg sync.WaitGroup
 
+	// json output stuff
+	var mut sync.Mutex
+	var jsonSlice []RequestResult
+
 	// check if urls found are alive
 	for _, url := range urls {
 		wg.Add(1)
-		go checkLink(&wg, url)
+		go func(url string) {
+			res, err := checkLink(&wg, url)
+
+			if err == nil {
+				mut.Lock()
+				jsonSlice = append(jsonSlice, res)
+				mut.Unlock()
+			}
+		}(url)
 	}
 
 	// wait for go routines to finish
 	wg.Wait()
+
+	if *jsonPtr {
+		urlsJ, err := json.Marshal(jsonSlice)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(string(urlsJ))
+		}
+
+	}
 }
