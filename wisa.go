@@ -32,7 +32,8 @@ func removeDuplicate(urls []string) []string {
 	return result
 }
 
-func checkLink(wg *sync.WaitGroup, url string) {
+func checkLink(wg *sync.WaitGroup, url string) int {
+	var status int
 
 	// defered function is run when surrounding functions are completed
 	defer wg.Done()
@@ -43,24 +44,24 @@ func checkLink(wg *sync.WaitGroup, url string) {
 		Timeout: 3 * time.Second,
 	}
 	resp, err := client.Head(url)
-	if err != nil {
-		return
-	}
 
 	if err != nil {
 		if *verbosePtr {
 			fmt.Println(err)
 		}
 	} else {
-		// Status codes https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 		if resp.StatusCode == 200 {
+			status = 0
 			color.New(color.FgGreen).Printf("[GOOD] [%d] %s\n", resp.StatusCode, url)
 		} else if resp.StatusCode == 400 || resp.StatusCode == 404 {
+			status = 3
 			color.New(color.FgRed).Printf("[BAD] [%d] %s\n", resp.StatusCode, url)
 		} else {
+			status = 3
 			color.New(color.FgGray).Printf("[UNKNOWN] [%d] %s\n", resp.StatusCode, url)
 		}
 	}
+	return status
 }
 
 func main() {
@@ -115,12 +116,25 @@ func main() {
 	// create workgroup to ensure all routines finish https://golang.org/pkg/sync/#WaitGroup
 	var wg sync.WaitGroup
 
+	var mut sync.Mutex
+	finalExit := 0
+
 	// check if urls found are alive
 	for _, url := range urls {
 		wg.Add(1)
-		go checkLink(&wg, url)
+		go func(url string) {
+			status := checkLink(&wg, url)
+
+			if status == 3 {
+				mut.Lock()
+				finalExit = status
+				mut.Unlock()
+			}
+		}(url)
 	}
 
 	// wait for go routines to finish
 	wg.Wait()
+
+	os.Exit(finalExit)
 }
