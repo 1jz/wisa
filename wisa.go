@@ -41,9 +41,10 @@ func removeDuplicate(urls []string) []string {
 	return result
 }
 
-func checkLink(wg *sync.WaitGroup, url string) (RequestResult, error) {
+func checkLink(wg *sync.WaitGroup, url string) (RequestResult, int, error) {
 	var r RequestResult
 	var reqErr error = nil
+	var status int
 
 	// defered function is run when surrounding functions are completed
 	defer wg.Done()
@@ -64,15 +65,18 @@ func checkLink(wg *sync.WaitGroup, url string) (RequestResult, error) {
 		r = RequestResult{url, resp.StatusCode}
 		if !*jsonPtr {
 			if resp.StatusCode == 200 {
+				status = 0
 				color.New(color.FgGreen).Printf("[GOOD] [%d] %s\n", resp.StatusCode, url)
 			} else if resp.StatusCode == 400 || resp.StatusCode == 404 {
+				status = 3
 				color.New(color.FgRed).Printf("[BAD] [%d] %s\n", resp.StatusCode, url)
 			} else {
+				status = 3
 				color.New(color.FgGray).Printf("[UNKNOWN] [%d] %s\n", resp.StatusCode, url)
 			}
 		}
 	}
-	return r, reqErr
+	return r, status, reqErr
 }
 
 func main() {
@@ -132,18 +136,25 @@ func main() {
 	var wg sync.WaitGroup
 
 	// json output stuff
-	var mut sync.Mutex
 	var jsonSlice []RequestResult
+	var mut sync.Mutex
+	finalExit := 0
 
 	// check if urls found are alive
 	for _, url := range urls {
 		wg.Add(1)
 		go func(url string) {
-			res, err := checkLink(&wg, url)
+			res, status, err := checkLink(&wg, url)
 
 			if err == nil {
 				mut.Lock()
 				jsonSlice = append(jsonSlice, res)
+				mut.Unlock()
+			}
+
+			if status == 3 {
+				mut.Lock()
+				finalExit = status
 				mut.Unlock()
 			}
 		}(url)
@@ -162,4 +173,5 @@ func main() {
 		}
 
 	}
+	os.Exit(finalExit)
 }
