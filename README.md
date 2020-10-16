@@ -18,6 +18,10 @@ for verbose output (error logs)
 
 ```wisa -f [file] -v```
 
+for ignoring certain URLs
+
+```wisa -i [ignore file] -f [file]```
+
 # Features
 
 - Uses go routines to check for dead/broken links
@@ -27,3 +31,4 @@ for verbose output (error logs)
 - All other codes are considered `DEAD`
 - Uses flags for passing filename and for verbose output
 - Coloured text using [gookit/color](https://github.com/gookit/color)
+- Provide a second file to ignore certain urls
