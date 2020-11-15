@@ -29,7 +29,7 @@ var (
 	IgnoreFilePtr *bool
 )
 
-// remove duplicate strings from a slice of strings
+// RemoveDuplicate removes duplicate strings from a slice of strings
 func RemoveDuplicate(urls []string) []string {
 	result := make([]string, 0, len(urls))
 	temp := map[string]struct{}{}
@@ -42,6 +42,7 @@ func RemoveDuplicate(urls []string) []string {
 	return result
 }
 
+// CheckLink makes a request to a URL passed and returns it's status
 func CheckLink(wg *sync.WaitGroup, url string) (RequestResult, int, error) {
 	var r RequestResult
 	var reqErr error = nil
@@ -80,7 +81,7 @@ func CheckLink(wg *sync.WaitGroup, url string) (RequestResult, int, error) {
 	return r, status, reqErr
 }
 
-//Goes through the url list and removes any url that matches with the ignore url list
+// IgnoreURL goes through the url list and removes any url that matches with the ignore url list
 func IgnoreURL(urls []string, ignoreList []string) []string {
 	//Loop through the url list
 	for i := 0; i < len(urls); i++ {
@@ -95,6 +96,7 @@ func IgnoreURL(urls []string, ignoreList []string) []string {
 	return urls
 }
 
+// GetIgnorePatterns creates a slice of URLs to ignore from the file string passed
 func GetIgnorePatterns(ignoreFilePath string, urlRegex *regexp.Regexp, ipRegex *regexp.Regexp) []string {
 	ignoreURLs := []string{}
 

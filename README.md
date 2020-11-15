@@ -1,13 +1,5 @@
-# wisa
+# WISA
 Who Is Still Alive: a broken link checker
-
-# Building
-
-Build:
-
-```go build wisa.go```
-
-Add wisa to your PATH or use it directly.
 
 # Usage
 type `wisa --help` for usage or:

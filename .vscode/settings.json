@@ -1,0 +1,5 @@
+{
+    "go.buildOnSave": "off",
+    "go.formatTool": "goreturns",
+    "go.lintTool": "golint"
+}
