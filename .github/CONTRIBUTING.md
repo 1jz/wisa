@@ -32,3 +32,27 @@ if you want `goreturns` write to the file for you
 Lint the project using `golint`
 
 ```golint ./...```
+
+## Testing Details
+
+#### To run tests for WISA run:
+
+`go test -v ./...`
+
+#### For package tests:
+
+`go test -coverpkg=pkgname -v`
+
+#### To visualize test coverage
+
+`go test -coverprofile=coverage -v ./...`
+
+then
+
+`go tool cover -html=coverage`
+
+This will open a browser and highlight what cases are covered and the ones that aren't
+
+### Making Tests
+
+In the directory containing the package you want to test, append `_test` to the filename of the file you are writing tests for. For instance, if writing tests for `package.go` the file should be named `package_test.go`
