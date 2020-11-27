@@ -46,7 +46,7 @@ func RemoveDuplicate(urls []string) []string {
 func CheckLink(wg *sync.WaitGroup, url string) (RequestResult, int, error) {
 	var r RequestResult
 	var reqErr error = nil
-	var status int
+	var status int = -1
 
 	// defered function is run when surrounding functions are completed
 	defer wg.Done()
@@ -67,10 +67,10 @@ func CheckLink(wg *sync.WaitGroup, url string) (RequestResult, int, error) {
 		r = RequestResult{url, resp.StatusCode}
 		if !*JSONPtr {
 			if resp.StatusCode == 200 {
-				status = 0
+				status = 1
 				color.New(color.FgGreen).Printf("[GOOD] [%d] %s\n", resp.StatusCode, url)
 			} else if resp.StatusCode == 400 || resp.StatusCode == 404 {
-				status = 3
+				status = 2
 				color.New(color.FgRed).Printf("[BAD] [%d] %s\n", resp.StatusCode, url)
 			} else {
 				status = 3
