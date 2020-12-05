@@ -1,6 +1,10 @@
 # WISA
 Who Is Still Alive: a broken link checker
 
+## Introduction
+
+This is my release 0.1 project for [DPS909](https://github.com/Seneca-CDOT/topics-in-open-source-2020/wiki/release-0.1) my open source development class. It is a command-line tool for finding and reporting dead links in a file.
+
 # Usage
 type `wisa --help` for usage or:
 
@@ -24,3 +28,8 @@ for ignoring certain URLs
 - Uses flags for passing filename and for verbose output
 - Coloured text using [gookit/color](https://github.com/gookit/color)
 - Provide a second file to ignore certain urls
+
+
+**TODO:** 
+
+refactor the entire project as it fails to follow go concepts.
