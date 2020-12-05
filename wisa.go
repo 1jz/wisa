@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/1jz/WISA/utils"
+	"github.com/1jz/wisa/utils"
 	flag "github.com/spf13/pflag"
 )
 

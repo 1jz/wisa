@@ -5,7 +5,21 @@ Who Is Still Alive: a broken link checker
 
 This is my release 0.1 project for [DPS909](https://github.com/Seneca-CDOT/topics-in-open-source-2020/wiki/release-0.1) my open source development class. It is a command-line tool for finding and reporting dead links in a file.
 
-# Usage
+## Installation
+
+### Manual
+```
+git clone https://github.com/1jz/wisa.git
+cd wisa
+go install
+```
+
+### Go
+```
+go get github.com/1jz/wisa
+```
+
+## Usage
 type `wisa --help` for usage or:
 
 ```wisa -f [file]```
