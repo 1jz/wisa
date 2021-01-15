@@ -95,7 +95,9 @@ func main() {
 		for _, url := range urls {
 			wg.Add(1)
 			go func(url string) {
-				res, status, err := utils.CheckLink(&wg, url)
+				// defered function is run when surrounding functions are completed
+				defer wg.Done()
+				res, status, err := utils.CheckLink(url)
 
 				if err == nil {
 					mut.Lock()

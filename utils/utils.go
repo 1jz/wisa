@@ -9,7 +9,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gookit/color"
@@ -43,13 +42,10 @@ func RemoveDuplicate(urls []string) []string {
 }
 
 // CheckLink makes a request to a URL passed and returns it's status
-func CheckLink(wg *sync.WaitGroup, url string) (RequestResult, int, error) {
+func CheckLink(url string) (RequestResult, int, error) {
 	var r RequestResult
 	var reqErr error = nil
 	var status int = -1
-
-	// defered function is run when surrounding functions are completed
-	defer wg.Done()
 
 	// use HEAD request https://golang.org/pkg/net/http/
 	// resp, err := http.Head(url)

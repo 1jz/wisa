@@ -2,7 +2,6 @@ package utils
 
 import (
 	"regexp"
-	"sync"
 	"testing"
 
 	flag "github.com/spf13/pflag"
@@ -25,17 +24,14 @@ func TestRemoveDuplicate(t *testing.T) {
 }
 
 func TestCheckLink(t *testing.T) {
-	var wg sync.WaitGroup
 
 	JSONPtr = flag.BoolP("json", "j", false, "json output")
 	VerbosePtr = flag.BoolP("version", "v", true, "verbose output")
 
-	wg.Add(4)
-	_, result1, _ := CheckLink(&wg, "https://httpstat.us/200")
-	_, result2, _ := CheckLink(&wg, "https://httpstat.us/404")
-	_, result3, _ := CheckLink(&wg, "https://httpstat.us/403")
-	_, result4, _ := CheckLink(&wg, "---")
-	wg.Wait()
+	_, result1, _ := CheckLink("https://httpstat.us/200")
+	_, result2, _ := CheckLink("https://httpstat.us/404")
+	_, result3, _ := CheckLink("https://httpstat.us/403")
+	_, result4, _ := CheckLink("---")
 
 	if result1 != 1 {
 		t.Errorf("CheckLink was incorrect, received: %d, want: %d.", result1, 1)
